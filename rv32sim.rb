@@ -196,3 +196,11 @@ class Simulator
     puts sprintf "pc = 0x%x (%d)", @cpu.pc, @cpu.pc
   end
 end
+
+if $0 == __FILE__
+  sim = Simulator.new
+  rom = File.binread(ARGV.shift)
+  sim.init_inst_memory(rom)
+  sim.start
+  sim.dump_registers
+end
