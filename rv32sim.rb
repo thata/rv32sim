@@ -23,8 +23,15 @@ class Decoder
   attr_reader :opcode, :rd, :funct3, :rs1, :rs2, :funct7, :i_imm, :s_imm, :b_imm
 
   def initialize
-    @opcode = @rd = @funct3 = @rs1 = @rs2 = @funct7 = nil
-    @i_imm = @s_imm = @b_imm = nil
+    @opcode = nil
+    @rd = nil
+    @funct3 = nil
+    @rs1 = nil
+    @rs2 = nil
+    @funct7 = nil
+    @i_imm = nil
+    @s_imm = nil
+    @b_imm = nil
   end
 
   def decode(inst)
@@ -33,20 +40,21 @@ class Decoder
     @funct3 = (inst & 0x00007000) >> 12
     @rs1 = (inst & 0x000f8000) >> 15
     @rs2 = (inst & 0x01f00000) >> 20
-    @funct7 = (opcode == 0b0110011) ? ((inst & 0xfe000000) >> 25) : nil
-
+    @funct7 = if opcode == 0b0110011
+                (inst & 0xfe000000) >> 25
+              else
+                nil
+              end
     @i_imm = (inst & 0xfff00000) >> 20
     @s_imm = ((inst & 0xfe000000) >> 20) | ((inst & 0x00000f80) >> 7)
     @b_imm = ((inst & 0x80000000) >> 19) |
-               ((inst & 0x00000080) << 4) |
-               ((inst & 0x7e000000) >> 20) |
-               ((inst & 0x00000f00) >> 7)
+             ((inst & 0x00000080) << 4) |
+             ((inst & 0x7e000000) >> 20) |
+             ((inst & 0x00000f00) >> 7)
   end
 end
 
 class Cpu
-  class EmptyInstractionError < RuntimeError; end
-
   INST_TABLE = {
     [0b0110011, 0x0, 0x00] => :_add,
     [0b0110011, 0x0, 0x20] => :_sub,
