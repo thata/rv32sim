@@ -1,3 +1,7 @@
+# RISC-V(RV32 subset) Simulator
+# usage:
+#   ruby rv32sim.rb sample/fibonacci.rom
+
 class Memory
   WORD_SIZE = 4
 
