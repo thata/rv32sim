@@ -1,6 +1,6 @@
 # ruby make_rom.rb > ./rom
 
-require "./instructions"
+require "../instructions"
 
 include Instructions
 
