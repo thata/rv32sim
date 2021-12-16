@@ -17,6 +17,38 @@ class Memory
     # RISC-Vはリトルエンディアンなので、「V = little endian unsigned 32bit」でメモリの内容を読み込む
     word.unpack("V").first
   end
+
+  def dump(out = $stdout)
+    i = 0
+    n_data = @data.size
+
+    while i < n_data
+      # address
+      out.printf "%08x    ", i
+
+      # data
+      eom = false
+      (0..3).each do |j|
+        break if eom
+        out.print "  " unless j == 0
+        (0..3).each do |k|
+          idx = i + (j * 4) + k
+          b = @data.getbyte(idx)
+          unless b
+            eom = true
+            break
+          end
+          out.print " " unless k == 0
+          break unless b
+          out.printf "%02x", b if b
+        end
+      end
+
+      out.print "\n"
+
+      i += 16
+    end
+  end
 end
 
 class Decoder
@@ -65,13 +97,16 @@ class Cpu
   }
 
   attr_accessor :pc
-  attr_reader :x_registers
+  attr_reader :x_registers, :inst_memory, :data_memory
 
   def initialize
     @pc = 0                   # プログラムカウンタ
     @x_registers = [0] * 32   # レジスタ
-    @inst_memory = Memory.new # 命令メモリ
     @decoder = Decoder.new
+    @inst_memory = Memory.new # 命令メモリ
+    @data_memory = Memory.new( # データメモリ
+      ("\x00" * 256).b
+    )
   end
 
   def init_inst_memory(data)
@@ -207,6 +242,11 @@ class Simulator
     puts "-" * 80
     puts sprintf "pc = 0x%x (%d)", @cpu.pc, @cpu.pc
   end
+
+  def dump_data_memory
+    puts "-" * 80
+    @cpu.data_memory.dump
+  end
 end
 
 if $0 == __FILE__
@@ -215,4 +255,5 @@ if $0 == __FILE__
   sim.init_inst_memory(rom)
   sim.start
   sim.dump_registers
+  sim.dump_data_memory
 end
