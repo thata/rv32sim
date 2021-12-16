@@ -21,15 +21,17 @@ class MemoryTest < Test::Unit::TestCase
   end
 
   def test_set_data
-    # ram = Memory.new
+    ram = Memory.new("\x93\x00\x01\x01\x94\x00\x01\x01")
 
-    # addr = 0
-    # assert_equal 0x00000000, ram.read(addr)
+    # いい感じに書き込めること
+    assert_equal 0x01010093, ram.read(0)
+    assert_equal 0x01010094, ram.read(4)
 
-    # ram.data = "\x93\x00\x01\x01\x94\x00\x01\x01"
+    ram.write(0, 0x01010095)
+    ram.write(4, 0x01010096)
 
-    # addr = 0
-    # assert_equal 0x01010093, ram.read(addr)
+    assert_equal 0x01010095, ram.read(0)
+    assert_equal 0x01010096, ram.read(4)
   end
 
   def test_dump

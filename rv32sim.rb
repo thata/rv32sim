@@ -18,6 +18,14 @@ class Memory
     word.unpack("V").first
   end
 
+  def write(addr, word)
+    data = [word].pack("V")
+    @data.setbyte(addr, data.getbyte(0))
+    @data.setbyte(addr + 1, data.getbyte(1))
+    @data.setbyte(addr + 2, data.getbyte(2))
+    @data.setbyte(addr + 3, data.getbyte(3))
+  end
+
   def dump(out = $stdout)
     i = 0
     n_data = @data.size
