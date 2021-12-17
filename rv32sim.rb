@@ -101,7 +101,9 @@ class Cpu
     [0b0110011, 0x6, 0x00] => :_or,
     [0b0110011, 0x7, 0x00] => :_and,
     [0b0010011, 0x0, nil] => :_addi,
-    [0b1100011, 0x0, nil] => :_beq
+    [0b1100011, 0x0, nil] => :_beq,
+    [0b0000011, 0x2, nil] => :_lw,
+    [0b0100011, 0x2, nil] => :_sw
   }
 
   attr_accessor :pc
@@ -217,6 +219,22 @@ class Cpu
           else
             @pc + 4
           end
+  end
+
+  def _lw
+    rd = @decoder.rd
+    rs1 = @decoder.rs1
+    imm = @decoder.i_imm
+    @x_registers[rd] = @data_memory.read(rs1 + imm)
+    @pc = @pc + 4
+  end
+
+  def _sw
+    rs1 = @decoder.rs1
+    rs2 = @decoder.rs2
+    imm = @decoder.s_imm
+    @data_memory.write(rs1 + imm, @x_registers[rs2])
+    @pc = @pc + 4
   end
 end
 

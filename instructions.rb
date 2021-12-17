@@ -62,4 +62,24 @@ module Instructions
       (imm5_10 << 25) |
       (imm12 << 31)
   end
+
+  def _lw(rd, rs1, imm)
+    0b0000011 |
+      (rd << 7) |
+      (0x2 << 12) |
+      (rs1 << 15) |
+      (imm << 20)
+  end
+
+  def _sw(rs1, rs2, imm)
+    imm0_4 = imm & 0b0000_0001_1111
+    imm5_11 = (imm & 0b1111_1110_0000) >> 5
+
+    0b0100011 |
+      (imm0_4 << 7) |
+      (0x2 << 12) |
+      (rs1 << 15) |
+      (rs2 << 20) |
+      (imm5_11 << 25)
+  end
 end
