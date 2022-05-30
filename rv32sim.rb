@@ -107,27 +107,26 @@ class Cpu
   }
 
   attr_accessor :pc
-  attr_reader :x_registers, :inst_memory, :data_memory
+  attr_reader :x_registers, :memory
 
   def initialize
     @pc = 0                   # プログラムカウンタ
     @x_registers = [0] * 32   # レジスタ
     @decoder = Decoder.new
-    @inst_memory = Memory.new # 命令メモリ
-    @data_memory = Memory.new( # データメモリ
-      ("\x00" * 256).b
+    @memory = Memory.new(     # メモリ
+      ("\x00" * 512).b
     )
   end
 
-  def init_inst_memory(data)
-    @inst_memory.data = data
+  def init_memory(data)
+    @memory.data[0, data.size] = data
   end
 
   def run
     inst = fetch
 
     # 命令メモリの範囲外に来たら false を返して処理を終える
-    return false unless inst
+    return false if inst.nil? || inst.zero?
 
     decode(inst)
     execute
@@ -135,7 +134,7 @@ class Cpu
   end
 
   def fetch
-    @inst_memory.read(@pc)
+    @memory.read(@pc)
   end
 
   def decode(inst)
@@ -225,7 +224,7 @@ class Cpu
     rd = @decoder.rd
     rs1 = @decoder.rs1
     imm = @decoder.i_imm
-    @x_registers[rd] = @data_memory.read(rs1 + imm)
+    @x_registers[rd] = @memory.read(rs1 + imm)
     @pc = @pc + 4
   end
 
@@ -233,7 +232,7 @@ class Cpu
     rs1 = @decoder.rs1
     rs2 = @decoder.rs2
     imm = @decoder.s_imm
-    @data_memory.write(rs1 + imm, @x_registers[rs2])
+    @memory.write(rs1 + imm, @x_registers[rs2])
     @pc = @pc + 4
   end
 end
@@ -243,8 +242,8 @@ class Simulator
     @cpu = Cpu.new
   end
 
-  def init_inst_memory(data)
-    @cpu.init_inst_memory(data)
+  def init_memory(data)
+    @cpu.init_memory(data)
   end
 
   def start
@@ -269,17 +268,17 @@ class Simulator
     puts sprintf "pc = 0x%x (%d)", @cpu.pc, @cpu.pc
   end
 
-  def dump_data_memory
+  def dump_memory
     puts "-" * 80
-    @cpu.data_memory.dump
+    @cpu.memory.dump
   end
 end
 
 if $0 == __FILE__
   sim = Simulator.new
-  rom = File.binread(ARGV.shift)
-  sim.init_inst_memory(rom)
+  mem = File.binread(ARGV.shift)
+  sim.init_memory(mem)
   sim.start
   sim.dump_registers
-  sim.dump_data_memory
+  sim.dump_memory
 end

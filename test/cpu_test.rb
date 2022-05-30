@@ -12,7 +12,7 @@ class CpuTest < Test::Unit::TestCase
     rom = [
       _add(1, 2, 3)
     ].pack("V*")
-    cpu.init_inst_memory(rom)
+    cpu.init_memory(rom)
     cpu.run
 
     assert_equal 4, cpu.pc
@@ -27,7 +27,7 @@ class CpuTest < Test::Unit::TestCase
     rom = [
       _and(1, 2, 3)
     ].pack("V*")
-    cpu.init_inst_memory(rom)
+    cpu.init_memory(rom)
     cpu.run
 
     assert_equal 4, cpu.pc
@@ -41,7 +41,7 @@ class CpuTest < Test::Unit::TestCase
       _addi(1, 2, 10),
       _addi(1, 1, -10)
     ].pack("V*")
-    cpu.init_inst_memory(rom)
+    cpu.init_memory(rom)
 
     # imm が正の数の場合
     cpu.x_registers[2] = 5
@@ -65,7 +65,7 @@ class CpuTest < Test::Unit::TestCase
     rom = [
       _beq(1, 2, 12)
     ].pack("V*")
-    cpu.init_inst_memory(rom)
+    cpu.init_memory(rom)
     cpu.run
     assert_equal 12, cpu.pc
 
@@ -76,7 +76,7 @@ class CpuTest < Test::Unit::TestCase
     rom = [
       _beq(1, 2, 12)
     ].pack("V*")
-    cpu.init_inst_memory(rom)
+    cpu.init_memory(rom)
     cpu.run
     assert_equal 4, cpu.pc
 
@@ -96,7 +96,7 @@ class CpuTest < Test::Unit::TestCase
       _nop,
       _beq(1, 2, -32) # <= address = 36
     ].pack("V*")
-    cpu.init_inst_memory(rom)
+    cpu.init_memory(rom)
     cpu.run
     assert_equal 4, cpu.pc
   end
@@ -109,7 +109,7 @@ class CpuTest < Test::Unit::TestCase
     ].pack("V*")
 
     cpu = Cpu.new
-    cpu.init_inst_memory(data)
+    cpu.init_memory(data)
 
     # x1 の初期値は 0
     assert_equal 0, cpu.x_registers[1]
