@@ -101,6 +101,28 @@ class CpuTest < Test::Unit::TestCase
     assert_equal 4, cpu.pc
   end
 
+  def test_sw_lw
+    cpu = Cpu.new
+
+    rom = [
+      _addi(1, 0, 0x16),   # x1 = 0x16
+      _addi(2, 0, 0xFF),   # x2 = 0xFF
+      _sw(1, 2, 0),        # M[x1] = x2
+      _lw(3, 1, 0),        # x3 = M[x1]
+      0                    # （ここに 0xFF が格納される）
+    ].pack("V*")
+    cpu.init_memory(rom)
+
+    cpu.run
+    cpu.run
+    cpu.run
+    cpu.run
+
+    assert_equal 0x16, cpu.x_registers[1]
+    assert_equal 0xff, cpu.x_registers[2]
+    assert_equal 0xff, cpu.x_registers[3]
+  end
+
   def test_run
     data = [
       _addi(1, 0, 10),

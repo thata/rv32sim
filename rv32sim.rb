@@ -224,7 +224,7 @@ class Cpu
     rd = @decoder.rd
     rs1 = @decoder.rs1
     imm = @decoder.i_imm
-    @x_registers[rd] = @memory.read(rs1 + imm)
+    @x_registers[rd] = @memory.read(@x_registers[rs1] + imm)
     @pc = @pc + 4
   end
 
@@ -232,7 +232,7 @@ class Cpu
     rs1 = @decoder.rs1
     rs2 = @decoder.rs2
     imm = @decoder.s_imm
-    @memory.write(rs1 + imm, @x_registers[rs2])
+    @memory.write(@x_registers[rs1] + imm, @x_registers[rs2])
     @pc = @pc + 4
   end
 end
