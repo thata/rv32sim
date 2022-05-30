@@ -21,7 +21,11 @@ rom = [
   _addi(2, 3, 0),    # f(i+1) = temp
   _addi(4, 4, 1),    # i = i + 1
   _beq(0, 0, -20),   # goto LOOP
-  _nop,              # BREAK:
+  _nop,
+  _nop,
+  _nop,
+  _nop,
+  _nop,
 ].pack("V*")
 
 print rom

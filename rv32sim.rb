@@ -92,6 +92,14 @@ class Decoder
              ((inst & 0x7e000000) >> 20) |
              ((inst & 0x00000f00) >> 7)
   end
+
+  def nop?
+    @opcode == 0b0010011 &&
+      @funct3 == 0 &&
+      @rd == 0 &&
+      @rs1 == 0 &&
+      @i_imm == 0
+  end
 end
 
 class Cpu
@@ -116,6 +124,7 @@ class Cpu
     @memory = Memory.new(     # メモリ
       ("\x00" * 512).b
     )
+    @nop_count = 0
   end
 
   def init_memory(data)
@@ -125,10 +134,11 @@ class Cpu
   def run
     inst = fetch
 
-    # 命令メモリの範囲外に来たら false を返して処理を終える
-    return false if inst.nil? || inst.zero?
-
     decode(inst)
+
+    # NOPが5回来たら処理を終える
+    return false if @nop_count >= 5
+
     execute
     true
   end
@@ -139,6 +149,11 @@ class Cpu
 
   def decode(inst)
     @decoder.decode(inst)
+    if @decoder.nop?
+      @nop_count += 1
+    else
+      @nop_count = 0
+    end
   end
 
   def execute
