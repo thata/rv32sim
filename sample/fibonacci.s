@@ -20,6 +20,8 @@ loop:
   addi x4, x4, 1    # i = i + 1
   beq x0, x0, loop  # goto loop
 break:
+  addi x6, x0, 0x100
+  sw x1, 0(x6)      # メモリの0x100番地へfib(10)の結果を格納
   nop
   nop
   nop
