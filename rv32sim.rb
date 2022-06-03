@@ -26,6 +26,38 @@ class Memory
     # 「signed int32」でメモリへ書き込む
     @data[addr, 4] = [word].pack("l")
   end
+
+  def dump(out = $stdout)
+    i = 0
+    n_data = @data.size
+
+    while i < n_data
+      # address
+      out.printf "%08x    ", i
+
+      # data
+      eom = false
+      (0..3).each do |j|
+        break if eom
+        out.print "  " unless j == 0
+        (0..3).each do |k|
+          idx = i + (j * 4) + k
+          b = @data.getbyte(idx)
+          unless b
+            eom = true
+            break
+          end
+          out.print " " unless k == 0
+          break unless b
+          out.printf "%02x", b if b
+        end
+      end
+
+      out.print "\n"
+
+      i += 16
+    end
+  end
 end
 
 class Decoder
@@ -252,6 +284,11 @@ class Simulator
     puts "-" * 80
     puts sprintf "pc = 0x%x (%d)", @cpu.pc, @cpu.pc
   end
+
+  def dump_memory
+    puts "-" * 80
+    @cpu.memory.dump
+  end
 end
 
 if $0 == __FILE__
@@ -260,4 +297,5 @@ if $0 == __FILE__
   sim.init_memory(mem)
   sim.start
   sim.dump_registers
+  sim.dump_memory
 end
