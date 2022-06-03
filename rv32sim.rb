@@ -72,6 +72,21 @@ class Decoder
   end
 end
 
+class Serial
+  def initialize(input = $stdin, output = $stdout)
+    @input = input
+    @output = output
+  end
+
+  def write(word)
+    @output.putc(word & 0xFF)
+  end
+
+  def read
+    @input.getc
+  end
+end
+
 class Cpu
   INST_TABLE = {
     [0b0110011, 0x0, 0x00] => :_add,
@@ -79,10 +94,12 @@ class Cpu
     [0b0110011, 0x6, 0x00] => :_or,
     [0b0110011, 0x7, 0x00] => :_and,
     [0b0010011, 0x0, nil] => :_addi,
+    [0b0010011, 0x1, nil] => :_slli,
     [0b1100011, 0x0, nil] => :_beq,
     [0b0000011, 0x2, nil] => :_lw,
     [0b0100011, 0x2, nil] => :_sw
   }
+  SERIAL_ADDRESS = 0x10000000
 
   attr_accessor :pc
   attr_reader :x_registers, :memory
@@ -95,6 +112,7 @@ class Cpu
       ("\x00" * 512).b
     )
     @nop_count = 0
+    @serial = Serial.new
   end
 
   def init_memory(data)
@@ -132,6 +150,10 @@ class Cpu
     send inst_symbol
   end
 
+  def serial_address?(address)
+    address == SERIAL_ADDRESS
+  end
+
   ### Instructions
 
   def _add
@@ -166,6 +188,14 @@ class Cpu
     rs1 = @decoder.rs1
     rs2 = @decoder.rs2
     @x_registers[rd] = @x_registers[rs1] & @x_registers[rs2]
+    @pc = @pc + 4
+  end
+
+  def _slli
+    rd = @decoder.rd
+    rs1 = @decoder.rs1
+    i_imm = @decoder.i_imm
+    @x_registers[rd] = @x_registers[rs1] << i_imm
     @pc = @pc + 4
   end
 
@@ -209,7 +239,14 @@ class Cpu
     rd = @decoder.rd
     rs1 = @decoder.rs1
     imm = @decoder.i_imm
-    @x_registers[rd] = @memory.read(@x_registers[rs1] + imm)
+    address = @x_registers[rs1] + imm
+    @x_registers[rd] =
+      if serial_address?(address)
+        # シリアルデバイスから読み込む
+        @serial.read
+      else
+        @memory.read(address)
+      end
     @pc = @pc + 4
   end
 
@@ -217,7 +254,13 @@ class Cpu
     rs1 = @decoder.rs1
     rs2 = @decoder.rs2
     imm = @decoder.s_imm
-    @memory.write(@x_registers[rs1] + imm, @x_registers[rs2])
+    address = @x_registers[rs1] + imm
+    if serial_address?(address)
+      # シリアルデバイスへ書き込む
+      @serial.write(@x_registers[rs2])
+    else
+      @memory.write(address, @x_registers[rs2])
+    end
     @pc = @pc + 4
   end
 end
