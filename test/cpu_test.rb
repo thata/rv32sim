@@ -11,7 +11,7 @@ class CpuTest < Test::Unit::TestCase
 
     rom = [
       _add(1, 2, 3)
-    ].pack("V*")
+    ].pack("l*")
     cpu.init_memory(rom)
     cpu.run
 
@@ -26,7 +26,7 @@ class CpuTest < Test::Unit::TestCase
 
     rom = [
       _and(1, 2, 3)
-    ].pack("V*")
+    ].pack("l*")
     cpu.init_memory(rom)
     cpu.run
 
@@ -40,7 +40,7 @@ class CpuTest < Test::Unit::TestCase
     rom = [
       _addi(1, 2, 10),
       _addi(1, 1, -10)
-    ].pack("V*")
+    ].pack("l*")
     cpu.init_memory(rom)
 
     # imm が正の数の場合
@@ -64,7 +64,7 @@ class CpuTest < Test::Unit::TestCase
     cpu.x_registers[2] = 1
     rom = [
       _beq(1, 2, 12)
-    ].pack("V*")
+    ].pack("l*")
     cpu.init_memory(rom)
     cpu.run
     assert_equal 12, cpu.pc
@@ -75,7 +75,7 @@ class CpuTest < Test::Unit::TestCase
     cpu.x_registers[2] = 2
     rom = [
       _beq(1, 2, 12)
-    ].pack("V*")
+    ].pack("l*")
     cpu.init_memory(rom)
     cpu.run
     assert_equal 4, cpu.pc
@@ -95,7 +95,7 @@ class CpuTest < Test::Unit::TestCase
       _nop,
       _nop,
       _beq(1, 2, -32) # <= address = 36
-    ].pack("V*")
+    ].pack("l*")
     cpu.init_memory(rom)
     cpu.run
     assert_equal 4, cpu.pc
@@ -110,7 +110,7 @@ class CpuTest < Test::Unit::TestCase
       _sw(1, 2, 0),        # M[x1] = x2
       _lw(3, 1, 0),        # x3 = M[x1]
       0                    # （ここに 0xFF が格納される）
-    ].pack("V*")
+    ].pack("l*")
     cpu.init_memory(rom)
 
     cpu.run
@@ -128,7 +128,7 @@ class CpuTest < Test::Unit::TestCase
       _addi(1, 0, 10),
       _addi(1, 1, 20),
       _beq(0, 0, -8)
-    ].pack("V*")
+    ].pack("l*")
 
     cpu = Cpu.new
     cpu.init_memory(data)

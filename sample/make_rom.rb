@@ -29,6 +29,6 @@ rom = [
   _nop,
   _nop,
   _nop,
-].pack("V*")
+].pack("l*")
 
 print rom
