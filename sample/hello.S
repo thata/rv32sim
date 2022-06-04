@@ -22,6 +22,18 @@ _start:
   sw t0, 0(gp)
   addi t0, zero, 'O'
   sw t0, 0(gp)
+  addi t0, zero, ' '
+  sw t0, 0(gp)
+  addi t0, zero, 'W'
+  sw t0, 0(gp)
+  addi t0, zero, 'O'
+  sw t0, 0(gp)
+  addi t0, zero, 'R'
+  sw t0, 0(gp)
+  addi t0, zero, 'L'
+  sw t0, 0(gp)
+  addi t0, zero, 'D'
+  sw t0, 0(gp)
   addi t0, zero, '!'
   sw t0, 0(gp)
   addi t0, zero, '!'
