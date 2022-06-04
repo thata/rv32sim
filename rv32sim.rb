@@ -83,7 +83,8 @@ class Serial
   end
 
   def read
-    @input.getc
+    # getc は String が返ってくるので、ASCIIコードに変換
+    @input.getc.ord
   end
 end
 
