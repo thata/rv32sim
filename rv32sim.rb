@@ -108,6 +108,12 @@ class Cpu
   def initialize
     @pc = 0                   # プログラムカウンタ
     @x_registers = [0] * 32   # レジスタ
+
+    # 0番レジスタは常に0を返す
+    def @x_registers.[](nth)
+      nth == 0 ? 0 : super
+    end
+
     @decoder = Decoder.new
     @memory = Memory.new(     # メモリ
       ("\x00" * 512).b

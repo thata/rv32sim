@@ -176,4 +176,24 @@ class CpuTest < Test::Unit::TestCase
     # _sw
     assert_equal 0b1000001_10111_10011_010_10001_0100011, _sw(19, 23, 0b1000_0011_0001)
   end
+
+  def test_x0_returns_zero
+    cpu = Cpu.new
+
+    rom = [
+      _addi(1, 0, 10),   # x1 = 10
+      _addi(2, 0, 20),   # x2 = 20
+      _add(3, 1, 2),     # x3 = x1 + x2
+      _add(0, 1, 2),     # x0 = x1 + x2
+    ].pack("l*")
+    cpu.init_memory(rom)
+
+    cpu.run
+    cpu.run
+    cpu.run
+    cpu.run
+
+    assert_equal 30, cpu.x_registers[3]
+    assert_equal 0, cpu.x_registers[0]
+  end
 end
