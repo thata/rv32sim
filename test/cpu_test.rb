@@ -1,5 +1,5 @@
-require "test_helper"
-require "rv32sim"
+require_relative "test_helper"
+require_relative "../rv32sim"
 
 class CpuTest < Test::Unit::TestCase
   include Instructions
