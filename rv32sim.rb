@@ -114,8 +114,6 @@ class Cpu
         nth == 0 ? 0 : super
       end
     end
-
-
     @decoder = Decoder.new
     @memory = Memory.new(     # メモリ
       ("\x00" * 512).b
