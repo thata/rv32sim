@@ -196,7 +196,7 @@ class Cpu
     rd = @decoder.rd
     rs1 = @decoder.rs1
     i_imm = @decoder.i_imm
-    @x_registers[rd] = @x_registers[rs1] << i_imm
+    @x_registers[rd] = @x_registers[rs1] << (i_imm & 0b11111)
     @pc = @pc + 4
   end
 
