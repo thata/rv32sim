@@ -1,7 +1,3 @@
-# RISC-V subset simulator
-# usage:
-#   ruby rv32sim.rb sample/fibonacci.rom
-
 class Memory
   WORD_SIZE = 4
 
@@ -62,29 +58,13 @@ class Decoder
              ((inst & 0x00000f00) >> 7)
   end
 
-  # nop命令（no operation 何も行わない命令）かどうかを判定（あとで使う）
+	# NOP命令（no operation 何も行わない命令）かどうかを判定（あとで使う）
   def nop?
     @opcode == 0b0010011 &&
       @funct3 == 0 &&
       @rd == 0 &&
       @rs1 == 0 &&
       @i_imm == 0
-  end
-end
-
-class Serial
-  def initialize(input = $stdin, output = $stdout)
-    @input = input
-    @output = output
-  end
-
-  def write(word)
-    @output.putc(word & 0xFF)
-  end
-
-  def read
-    # getc は String が返ってくるので、ASCIIコードに変換
-    @input.getc.ord
   end
 end
 
@@ -95,12 +75,11 @@ class Cpu
     [0b0110011, 0x6, 0x00] => :_or,
     [0b0110011, 0x7, 0x00] => :_and,
     [0b0010011, 0x0, nil] => :_addi,
-    [0b0010011, 0x1, nil] => :_slli,
+		[0b0010011, 0x1, nil] => :_slli,
     [0b1100011, 0x0, nil] => :_beq,
     [0b0000011, 0x2, nil] => :_lw,
     [0b0100011, 0x2, nil] => :_sw
   }
-  SERIAL_ADDRESS = 0x10000000
 
   attr_accessor :pc
   attr_reader :x_registers, :memory
@@ -108,18 +87,18 @@ class Cpu
   def initialize
     @pc = 0                   # プログラムカウンタ
     @x_registers = [0] * 32   # レジスタ
-    class << @x_registers
+		class << @x_registers
       # x0は常に0を返す
       def [](nth)
         nth == 0 ? 0 : super
       end
     end
+
     @decoder = Decoder.new
     @memory = Memory.new(     # メモリ
       ("\x00" * 512).b
     )
     @nop_count = 0
-    @serial = Serial.new
   end
 
   def init_memory(data)
@@ -155,10 +134,6 @@ class Cpu
     key = [@decoder.opcode, @decoder.funct3, @decoder.funct7]
     inst_symbol = INST_TABLE[key]
     send inst_symbol
-  end
-
-  def serial_address?(address)
-    address == SERIAL_ADDRESS
   end
 
   ### Instructions
@@ -198,7 +173,7 @@ class Cpu
     @pc = @pc + 4
   end
 
-  def _slli
+	def _slli
     rd = @decoder.rd
     rs1 = @decoder.rs1
     i_imm = @decoder.i_imm
@@ -246,14 +221,7 @@ class Cpu
     rd = @decoder.rd
     rs1 = @decoder.rs1
     imm = @decoder.i_imm
-    address = @x_registers[rs1] + imm
-    @x_registers[rd] =
-      if serial_address?(address)
-        # シリアルデバイスから読み込む
-        @serial.read
-      else
-        @memory.read(address)
-      end
+    @x_registers[rd] = @memory.read(@x_registers[rs1] + imm)
     @pc = @pc + 4
   end
 
@@ -261,13 +229,7 @@ class Cpu
     rs1 = @decoder.rs1
     rs2 = @decoder.rs2
     imm = @decoder.s_imm
-    address = @x_registers[rs1] + imm
-    if serial_address?(address)
-      # シリアルデバイスへ書き込む
-      @serial.write(@x_registers[rs2])
-    else
-      @memory.write(address, @x_registers[rs2])
-    end
+    @memory.write(@x_registers[rs1] + imm, @x_registers[rs2])
     @pc = @pc + 4
   end
 end
