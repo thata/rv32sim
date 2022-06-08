@@ -5,7 +5,7 @@
 ## 使い方
 
 ```sh
-$ git clone git@github.com:thata/rv32sim.git
+$ git clone https://github.com/thata/rv32sim.git
 $ cd rv32sim
 $ ruby rv32sim.rb sample/hello.rom
 HELLO WORLD!!
