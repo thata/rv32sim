@@ -1,8 +1,6 @@
-# rv32sim: RISC-V Simulator
+# rv32sim: RISC-V subset simulator
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/d0iasm/rvemu/master/LICENSE)
-
-RISC-Vのサブセットのシミュレータ。
 
 ## 使い方
 
