@@ -7,7 +7,7 @@ class Memory
 
   attr_accessor :data
 
-  def initialize(data = nil)
+  def initialize(data)
     # バイナリデータとして扱いたいので ASCII-8BIT エンコーディングへ変換
     @data = data.b
   end
