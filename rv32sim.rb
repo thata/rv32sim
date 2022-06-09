@@ -7,7 +7,7 @@ class Memory
 
   attr_accessor :data
 
-  def initialize(data)
+  def initialize(data = "\0" * 512)
     # バイナリデータとして扱いたいので ASCII-8BIT エンコーディングへ変換
     @data = data.b
   end
