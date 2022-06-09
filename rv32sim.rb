@@ -49,6 +49,7 @@ class Decoder
     @funct3 = (inst & 0x00007000) >> 12
     @rs1 = (inst & 0x000f8000) >> 15
     @rs2 = (inst & 0x01f00000) >> 20
+    # funct7 は R 形式(opcode = 0b0110011)でしか利用しないため、R形式でなければ nil を返す
     @funct7 = if opcode == 0b0110011
                 (inst & 0xfe000000) >> 25
               else
