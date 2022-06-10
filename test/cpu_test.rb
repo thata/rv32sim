@@ -34,6 +34,21 @@ class CpuTest < Test::Unit::TestCase
     assert_equal 0xff000000, cpu.x_registers[1]
   end
 
+  def test_or
+    cpu = Cpu.new
+    cpu.x_registers[2] = 0xff00ff00
+    cpu.x_registers[3] = 0x00ff00f0
+
+    rom = [
+      _or(1, 2, 3)
+    ].pack("l*")
+    cpu.init_memory(rom)
+    cpu.run
+
+    assert_equal 4, cpu.pc
+    assert_equal 0xfffffff0, cpu.x_registers[1]
+  end
+
   def test_addi
     cpu = Cpu.new
 

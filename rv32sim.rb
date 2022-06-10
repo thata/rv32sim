@@ -187,9 +187,6 @@ class Cpu
     rs2 = @decoder.rs2
     @x_registers[rd] = @x_registers[rs1] | @x_registers[rs2]
     @pc = @pc + 4
-
-    @x_registers[@rd] = @x_registers[@rs1] | @x_registers[@rs2]
-    @pc = @pc + 4
   end
 
   def _and
