@@ -1,6 +1,6 @@
 # rv32sim: RISC-V subset simulator
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/d0iasm/rvemu/master/LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/thata/rv32sim/master/LICENSE)
 
 ## Usage
 
