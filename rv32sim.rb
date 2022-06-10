@@ -49,12 +49,7 @@ class Decoder
     @funct3 = (inst & 0x00007000) >> 12
     @rs1 = (inst & 0x000f8000) >> 15
     @rs2 = (inst & 0x01f00000) >> 20
-    # funct7 は R 形式(opcode = 0b0110011)でしか利用しないため、R形式でなければ nil を返す
-    @funct7 = if opcode == 0b0110011
-                (inst & 0xfe000000) >> 25
-              else
-                nil
-              end
+    @funct7 = (inst & 0xfe000000) >> 25
     @i_imm = (inst & 0xfff00000) >> 20
     @s_imm = ((inst & 0xfe000000) >> 20) | ((inst & 0x00000f80) >> 7)
     @b_imm = ((inst & 0x80000000) >> 19) |
@@ -96,11 +91,11 @@ class Cpu
     [0b0110011, 0x0, 0x20] => :_sub,
     [0b0110011, 0x6, 0x00] => :_or,
     [0b0110011, 0x7, 0x00] => :_and,
-    [0b0010011, 0x0, nil] => :_addi,
-    [0b0010011, 0x1, nil] => :_slli,
-    [0b1100011, 0x0, nil] => :_beq,
-    [0b0000011, 0x2, nil] => :_lw,
-    [0b0100011, 0x2, nil] => :_sw
+    [0b0010011, 0x0]       => :_addi,
+    [0b0010011, 0x1]       => :_slli,
+    [0b1100011, 0x0]       => :_beq,
+    [0b0000011, 0x2]       => :_lw,
+    [0b0100011, 0x2]       => :_sw
   }
   SERIAL_ADDRESS = 0x10000000
 
@@ -154,8 +149,9 @@ class Cpu
   end
 
   def execute
-    key = [@decoder.opcode, @decoder.funct3, @decoder.funct7]
-    inst_symbol = INST_TABLE[key]
+    op_f3_f7 = [@decoder.opcode, @decoder.funct3, @decoder.funct7]
+    op_f3 = [@decoder.opcode, @decoder.funct3]
+    inst_symbol = INST_TABLE[op_f3_f7] || INST_TABLE[op_f3]
     send inst_symbol
   end
 
