@@ -1,7 +1,5 @@
 # rv32sim: RISC-V subset simulator
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/thata/rv32sim/master/LICENSE)
-
 ## Usage
 
 ```sh
@@ -22,6 +20,10 @@ x28 = 0x0 (0)	x29 = 0x0 (0)	x30 = 0x0 (0)	x31 = 0x0 (0)
 pc = 0x88 (136)
 $
 ```
+
+## License
+
+This software is released under the MIT License, see LICENSE.
 
 ## Supported Instructions
 - RV32I Subset
