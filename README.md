@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/d0iasm/rvemu/master/LICENSE)
 
-## 使い方
+## Usage
 
 ```sh
 $ git clone https://github.com/thata/rv32sim.git
@@ -23,7 +23,7 @@ pc = 0x88 (136)
 $
 ```
 
-## サポートしてる命令
+## Supported Instructions
 - RV32I Subset
   - add (ADD)
   - sub (SUB)
