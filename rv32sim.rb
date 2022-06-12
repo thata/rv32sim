@@ -29,7 +29,7 @@ class Memory
 end
 
 class Decoder
-  attr_reader :opcode, :rd, :funct3, :rs1, :rs2, :funct7, :i_imm, :s_imm, :b_imm
+  attr_reader :opcode, :rd, :funct3, :rs1, :rs2, :funct7, :i_imm, :s_imm, :b_imm, :u_imm, :j_imm
 
   def initialize
     @opcode = nil
@@ -41,6 +41,8 @@ class Decoder
     @i_imm = nil
     @s_imm = nil
     @b_imm = nil
+    @u_imm = nil
+    @j_imm = nil
   end
 
   def decode(inst)
@@ -56,6 +58,11 @@ class Decoder
              ((inst & 0x00000080) << 4) |
              ((inst & 0x7e000000) >> 20) |
              ((inst & 0x00000f00) >> 7)
+    @u_imm = (inst & 0xfffff000) >> 12
+    @j_imm = (((inst & 0x80000000) >> 31) << 19) |
+             (((inst & 0x7FE00000) >> 21) << 1) |
+             (((inst & 0x00100000) >> 20) << 11) |
+             (((inst & 0x000FF000) >> 12) << 12)
   end
 
   # nop命令（no operation 何も行わない命令）かどうかを判定（あとで使う）
@@ -95,7 +102,8 @@ class Cpu
     [0b0010011, 0x1]       => :_slli,
     [0b1100011, 0x0]       => :_beq,
     [0b0000011, 0x2]       => :_lw,
-    [0b0100011, 0x2]       => :_sw
+    [0b0100011, 0x2]       => :_sw,
+    [0b0010111]            => :_auipc
   }
   SERIAL_ADDRESS = 0x10000000
 
@@ -151,7 +159,8 @@ class Cpu
   def execute
     op_f3_f7 = [@decoder.opcode, @decoder.funct3, @decoder.funct7]
     op_f3 = [@decoder.opcode, @decoder.funct3]
-    inst_symbol = INST_TABLE[op_f3_f7] || INST_TABLE[op_f3]
+    op = [@decoder.opcode]
+    inst_symbol = INST_TABLE[op_f3_f7] || INST_TABLE[op_f3] || INST_TABLE[op]
     send inst_symbol
   end
 
@@ -263,6 +272,14 @@ class Cpu
     else
       @memory.write(address, @x_registers[rs2])
     end
+    @pc = @pc + 4
+  end
+
+  def _auipc
+    # binding.pry
+    rd = @decoder.rd
+    imm = @decoder.u_imm
+    @x_registers[rd] = @pc + (imm << 12)
     @pc = @pc + 4
   end
 end

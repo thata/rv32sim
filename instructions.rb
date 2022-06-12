@@ -82,4 +82,12 @@ module Instructions
       (rs2 << 20) |
       (imm5_11 << 25)
   end
+
+  def _auipc(rd, imm)
+    imm12_31 = imm & 0xFFFFF000
+
+    0b0010111 |
+      (rd << 7) |
+      imm12_31
+  end
 end
