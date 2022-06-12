@@ -39,5 +39,17 @@ class DecoderTest < Test::Unit::TestCase
     assert_equal decoder.rs1, 0b10011
     assert_equal decoder.rs2, 0b10111
     assert_equal decoder.b_imm, 0b1110000110010
+
+    # U形式
+    decoder.decode(0b10000000000000000001_10001_1000001)
+    assert_equal decoder.opcode, 0b1000001
+    assert_equal decoder.rd, 0b10001
+    assert_equal decoder.u_imm, 0b10000000000000000001
+
+    # J形式
+    decoder.decode(0b1_1000000001_1_10000001_10001_1000001)
+    assert_equal decoder.opcode, 0b1000001
+    assert_equal decoder.rd, 0b10001
+    assert_equal ("%020b" % decoder.j_imm), ("%020b" % 0b11000000111000000001)
   end
 end
