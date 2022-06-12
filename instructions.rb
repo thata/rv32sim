@@ -84,10 +84,10 @@ module Instructions
   end
 
   def _auipc(rd, imm)
-    imm12_31 = imm & 0xFFFFF000
+    imm12_31 = imm
 
     0b0010111 |
       (rd << 7) |
-      imm12_31
+      imm << 12
   end
 end

@@ -71,29 +71,33 @@ class CpuTest < Test::Unit::TestCase
   end
 
   def test_auipc
-    cpu = Cpu.new
-
+    # imm が正の数の場合
     rom = [
       _nop,
       _nop,
       _nop,
-      _auipc(1, 0x7FFFF000)
+      _auipc(1, 0x7FFFF)
     ].pack("l*")
+    cpu = Cpu.new
     cpu.init_memory(rom)
-
-    # imm が正の数の場合
     cpu.x_registers[1] = 0
     cpu.run
     cpu.run
     cpu.run
     cpu.run
     assert_equal 16, cpu.pc
-    assert_equal 0x7FFFF00C, cpu.x_registers[1]
+    assert_equal ("%05x" % 0x7FFFF00C), ("%05x" % cpu.x_registers[1])
 
-    # # imm が負の数の場合
-    # cpu.run
-    # assert_equal 8, cpu.pc
-    # assert_equal 5, cpu.x_registers[1]
+    # imm が負の数の場合
+    rom = [
+      _auipc(1, 0xFFFFF)
+    ].pack("l*")
+    cpu = Cpu.new
+    cpu.init_memory(rom)
+    cpu.x_registers[1] = 0
+    cpu.run
+    assert_equal 4, cpu.pc
+    assert_equal -4096, cpu.x_registers[1]
   end
 
   def test_beq

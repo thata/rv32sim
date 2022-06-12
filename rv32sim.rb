@@ -98,12 +98,12 @@ class Cpu
     [0b0110011, 0x0, 0x20] => :_sub,
     [0b0110011, 0x6, 0x00] => :_or,
     [0b0110011, 0x7, 0x00] => :_and,
-    [0b0010011, 0x0]       => :_addi,
-    [0b0010011, 0x1]       => :_slli,
-    [0b1100011, 0x0]       => :_beq,
-    [0b0000011, 0x2]       => :_lw,
-    [0b0100011, 0x2]       => :_sw,
-    [0b0010111]            => :_auipc
+    [0b0010011, 0x0] => :_addi,
+    [0b0010011, 0x1] => :_slli,
+    [0b1100011, 0x0] => :_beq,
+    [0b0000011, 0x2] => :_lw,
+    [0b0100011, 0x2] => :_sw,
+    [0b0010111] => :_auipc
   }
   SERIAL_ADDRESS = 0x10000000
 
@@ -276,10 +276,9 @@ class Cpu
   end
 
   def _auipc
-    # binding.pry
     rd = @decoder.rd
-    imm = @decoder.u_imm
-    @x_registers[rd] = @pc + (imm << 12)
+    imm = [@decoder.u_imm << 12].pack("L").unpack1("l")
+    @x_registers[rd] = @pc + imm
     @pc = @pc + 4
   end
 end
