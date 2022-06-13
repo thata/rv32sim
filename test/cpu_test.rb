@@ -146,6 +146,60 @@ class CpuTest < Test::Unit::TestCase
     assert_equal 4, cpu.pc
   end
 
+  def test_jalr
+    cpu = Cpu.new
+
+    # XXX: 行き当たりばったりに書いたのでゴチャゴチャしてる...
+    rom = [
+      _addi(2, 0, 40),  # x2 = foo
+      _jalr(1, 2, 0),   # call foo （ t=pc+4; pc=(x2+0) & ~1; x1=t ）
+      _add(31, 29, 30), # x31 = x29 + x30
+      _nop,
+      _jalr(1, 31, -5), # call bar （ t=pc+4; pc=(x31-5)&~1）; x1=t ）
+      _addi(28, 0, 49), # x28 = 49
+      # bar:
+      _addi(27, 0, 46), # x27 = 46
+      _jalr(0, 1, 0),   # ret
+      _nop,
+      _nop,
+      # foo:
+      _addi(29, 0, 10), # x29 = 10
+      _addi(30, 0, 20), # x30 = 20
+      _jalr(0, 1, 0)    # ret
+    ].pack("l*")
+    cpu.init_memory(rom)
+
+    cpu.run # x2 = 40
+    cpu.run # jalr x1, x2, 0
+
+    assert_equal 40, cpu.pc
+    assert_equal 8, cpu.x_registers[1]
+
+    cpu.run # x29 = 10
+    cpu.run # x30 = 20
+    cpu.run # ret
+
+    assert_equal 8, cpu.pc
+
+    cpu.run # x31 = x29 + x30
+
+    assert_equal 30, cpu.x_registers[31]
+
+    cpu.run # nop
+    cpu.run # jalr x1, x31, -5
+
+    assert_equal 24, cpu.pc
+    assert_equal 20, cpu.x_registers[1]
+
+    cpu.run # x27 = 46
+    cpu.run # ret
+    cpu.run # x28 = 49
+
+    assert_equal 24, cpu.pc
+    assert_equal 46, cpu.x_registers[27]
+    assert_equal 49, cpu.x_registers[28]
+  end
+
   def test_sw_lw
     cpu = Cpu.new
 

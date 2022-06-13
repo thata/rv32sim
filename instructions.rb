@@ -90,4 +90,12 @@ module Instructions
       (rd << 7) |
       imm << 12
   end
+
+  def _jalr(rd, rs1, imm)
+    0b1100111 |
+      (rd << 7) |
+      (0x0 << 12) |
+      (rs1 << 15) |
+      (imm << 20)
+  end
 end

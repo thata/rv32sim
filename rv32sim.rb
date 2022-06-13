@@ -100,6 +100,7 @@ class Cpu
     [0b0110011, 0x7, 0x00] => :_and,
     [0b0010011, 0x0] => :_addi,
     [0b0010011, 0x1] => :_slli,
+    [0b1100111, 0x0] => :_jalr,
     [0b1100011, 0x0] => :_beq,
     [0b0000011, 0x2] => :_lw,
     [0b0100011, 0x2] => :_sw,
@@ -280,6 +281,17 @@ class Cpu
     imm = [@decoder.u_imm << 12].pack("L").unpack1("l")
     @x_registers[rd] = @pc + imm
     @pc = @pc + 4
+  end
+
+  def _jalr
+    rd = @decoder.rd
+    rs1 = @decoder.rs1
+    # 12ビット即値の符号拡張
+    offset = ((@decoder.i_imm & 0x800) >> 11) == 0 ? @decoder.i_imm : @decoder.i_imm - 0x1000
+
+    t = @pc + 4
+    @pc = (@x_registers[rs1] + offset) & 0xFFFFFFFE
+    @x_registers[rd] = t
   end
 end
 
