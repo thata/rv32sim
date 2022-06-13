@@ -104,7 +104,9 @@ class Cpu
     [0b1100011, 0x0] => :_beq,
     [0b0000011, 0x2] => :_lw,
     [0b0100011, 0x2] => :_sw,
-    [0b0010111] => :_auipc
+    [0b0010111] => :_auipc,
+    [0b0110111] => :_lui,
+    [0b1101111] => :_jal
   }
   SERIAL_ADDRESS = 0x10000000
 
@@ -281,6 +283,28 @@ class Cpu
     imm = [@decoder.u_imm << 12].pack("L").unpack1("l")
     @x_registers[rd] = @pc + imm
     @pc = @pc + 4
+  end
+
+  def _lui
+    binding.pry
+    # rd = @decoder.rd
+    # imm = [@decoder.u_imm << 12].pack("L").unpack1("l")
+    # @x_registers[rd] = @pc + imm
+    # @pc = @pc + 4
+  end
+
+  def _jal
+    rd = @decoder.rd
+    imm = @decoder.j_imm << 1
+    imm = ((imm & 0x100000) >> 20).zero? ? imm : imm - 0x200000
+
+    @x_registers[rd] = @pc + 4
+    @pc = @pc + imm
+
+    # rd = @decoder.rd
+    # imm = [@decoder.u_imm << 12].pack("L").unpack1("l")
+    # @x_registers[rd] = @pc + imm
+    # @pc = @pc + 4
   end
 
   def _jalr

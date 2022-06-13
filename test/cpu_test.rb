@@ -146,6 +146,55 @@ class CpuTest < Test::Unit::TestCase
     assert_equal 4, cpu.pc
   end
 
+  def test_jal
+    cpu = Cpu.new
+
+    rom = [
+      _addi(29, 0, 10), # x29 = 10
+      _jal(1, 40),      # call foo （ x1 = pc+4; pc = pc + 40 ）
+      _nop,
+      # bar
+      _add(31, 29, 30), # x31 = x29 + x30
+      _jalr(0, 1, 0),   # ret
+      _nop,
+      _nop,
+      _nop,
+      _nop,
+      _nop,
+      _nop,
+      # foo
+      _addi(30, 0, 20), # x30 = 20
+      _addi(2, 1, 0),   # x2 = x1 （戻り先を退避）
+      _jal(1, -40),     # call bar （x1 = pc+4; pc = pc - 40）
+      _addi(1, 2, 0),   # x1 = x2 （戻り先を復元）
+      _jalr(0, 1, 0)    # ret
+    ].pack("l*")
+    cpu.init_memory(rom)
+
+    cpu.run # x29 = 10
+    cpu.run # call foo （ x1 = pc+4; pc = pc + 40 ）
+
+    assert_equal 44, cpu.pc
+    assert_equal 8, cpu.x_registers[1]
+
+    cpu.run # x30 = 20
+    cpu.run # x2 = x1
+    cpu.run # call bar
+
+    assert_equal 12, cpu.pc
+
+    cpu.run # x30 = 20
+    cpu.run # ret
+
+    assert_equal 56, cpu.pc
+
+    cpu.run # x1 = x2
+    cpu.run # ret
+
+    assert_equal 8, cpu.pc
+    assert_equal 30, cpu.x_registers[31]
+  end
+
   def test_jalr
     cpu = Cpu.new
 
