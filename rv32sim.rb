@@ -300,11 +300,6 @@ class Cpu
 
     @x_registers[rd] = @pc + 4
     @pc = @pc + imm
-
-    # rd = @decoder.rd
-    # imm = [@decoder.u_imm << 12].pack("L").unpack1("l")
-    # @x_registers[rd] = @pc + imm
-    # @pc = @pc + 4
   end
 
   def _jalr
