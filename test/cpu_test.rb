@@ -70,6 +70,22 @@ class CpuTest < Test::Unit::TestCase
     assert_equal 5, cpu.x_registers[1]
   end
 
+  def test_lui
+    cpu = Cpu.new
+
+    rom = [
+      _lui(1, 0x7CAFE),
+      _lui(2, 0x8CAFE),
+    ].pack("l*")
+    cpu.init_memory(rom)
+
+    cpu.run
+    cpu.run
+
+    assert_equal 2091900928, cpu.x_registers[1]
+    assert_equal -1934630912, cpu.x_registers[2]
+  end
+
   def test_auipc
     # imm が正の数の場合
     rom = [
@@ -97,7 +113,7 @@ class CpuTest < Test::Unit::TestCase
     cpu.x_registers[1] = 0
     cpu.run
     assert_equal 4, cpu.pc
-    assert_equal -4096, cpu.x_registers[1]
+    assert_equal (-4096), cpu.x_registers[1]
   end
 
   def test_beq

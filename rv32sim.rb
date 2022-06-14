@@ -286,11 +286,10 @@ class Cpu
   end
 
   def _lui
-    binding.pry
-    # rd = @decoder.rd
-    # imm = [@decoder.u_imm << 12].pack("L").unpack1("l")
-    # @x_registers[rd] = @pc + imm
-    # @pc = @pc + 4
+    rd = @decoder.rd
+    imm = [@decoder.u_imm << 12].pack("L").unpack1("l")
+    @x_registers[rd] = imm
+    @pc = @pc + 4
   end
 
   def _jal
