@@ -4,10 +4,11 @@
 
 class Memory
   WORD_SIZE = 4
+  MEMORY_SIZE = 65536
 
   attr_accessor :data
 
-  def initialize(data = "\0" * 512)
+  def initialize(data = "\0" * MEMORY_SIZE)
     # バイナリデータとして扱いたいので ASCII-8BIT エンコーディングへ変換
     @data = data.b
   end
@@ -102,6 +103,7 @@ class Cpu
     [0b0010011, 0x1] => :_slli,
     [0b1100111, 0x0] => :_jalr,
     [0b1100011, 0x0] => :_beq,
+    [0b1100011, 0x1] => :_bne,
     [0b0000011, 0x2] => :_lw,
     [0b0100011, 0x2] => :_sw,
     [0b0010111] => :_auipc,
@@ -124,7 +126,7 @@ class Cpu
     end
     @decoder = Decoder.new
     @memory = Memory.new(     # メモリ
-      ("\x00" * 512).b
+      ("\x00" * Memory::MEMORY_SIZE).b
     )
     @nop_count = 0
     @serial = Serial.new
@@ -246,6 +248,26 @@ class Cpu
             @pc + imm
           else
             @pc + 4
+          end
+  end
+
+  def _bne
+    rd = @decoder.rd
+    rs1 = @decoder.rs1
+    rs2 = @decoder.rs2
+    b_imm = @decoder.b_imm
+
+    minus_flg = (b_imm & 0b1000000000000) >> 12
+    imm = if minus_flg == 1
+            # TODO もっといい感じに書きたい
+            imm = (0b10000000000000 - b_imm) * -1
+          else
+            imm = b_imm
+          end
+    @pc = if @x_registers[rs1] == @x_registers[rs2]
+            @pc + 4
+          else
+            @pc + imm
           end
   end
 
